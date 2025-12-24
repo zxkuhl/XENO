@@ -479,7 +479,7 @@ function XENO:AddDropdown(name, options, default, callback, notificationOnIntera
         OptBtn.MouseButton1Click:Connect(function()
             TweenService:Create(ItemContainer, TWEEN_CLICK, {Size = UDim2.new(0.9, 0, 0, 28)}):Play(); wait(0.1)
             TweenService:Create(ItemContainer, TWEEN_FAST, {Size = UDim2.new(0.95, 0, 0, 30)}):Play()
-            SelectedLabel.Text = option; Toggle(); if callback then callback(option) end; if notificationOnInteract then OnyxLib:Notify("Dropdown", "Selected: " .. option, 2) end
+            SelectedLabel.Text = option; Toggle(); if callback then callback(option) end; if notificationOnInteract then XENO:Notify("Dropdown", "Selected: " .. option, 2) end
         end)
     end
 end
