@@ -506,58 +506,8 @@ ToggleIcon = Create("TextLabel", {Text = "❖", Size = UDim2.new(1, 0, 1, 0), Ba
 ToggleBtn.MouseButton1Click:Connect(ToggleUI)
 
 
---[[ ==========================================
-     SECTION: USAGE EXAMPLES
-     ========================================== ]]
---[[ 
-XENO:AddSearchBar()
-
--- 1. NORMAL FEATURES SECTION
-XENO:AddHeader("NORMAL FEATURES")
-XENO:AddLabel("Standard interactions without alerts")
-
-XENO:AddButton("Print to Console", function()
-    print("This is a standard button")
-end, false)
-
-XENO:AddSwitch("Standard Switch", function(state)
-    print("Switch is now:", state)
-end, false)
-
-XENO:AddSlider("WalkSpeed", 16, 100, 16, function(val)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = val
-    end
-end)
-
-XENO:AddDropdown("Teleport List", {"Spawn", "Bank", "Safe Zone"}, "Spawn", function(opt)
-    print("Teleporting to:", opt)
-end, false)
 
 
--- 2. NOTIFICATION FEATURES SECTION
-XENO:AddHeader("NOTIFICATION FEATURES")
-XENO:AddLabel("These alert you when used")
-
-XENO:AddButton("Secure Check", function()
-    wait(0.5)
-end, true)
-
-XENO:AddSwitch("Auto-Farm", function(state)
-    -- Logic here
-end, true)
-
-XENO:AddSlider("Notify Slider", 0, 100, 50, function(val)
-    -- Realtime notification updates (tag system handles spam)
-end, true)
-
-XENO:AddDropdown("Aim Mode", {"Legit", "Blatant", "Rage"}, "Legit", function(opt)
-    -- Logic here
-end, true)
-
-XENO:AddKeybind("Toggle Interface", Enum.KeyCode.RightControl, function()
-    ToggleUI()
-end, true) ]]
 
 
 --- Start Sequence ---
