@@ -223,14 +223,11 @@ local SettingsScroll = Create("ScrollingFrame", {Size = UDim2.new(1, 0, 1, 0), B
 local SettingsLayout = Create("UIListLayout", {Parent = SettingsScroll, HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10)})
 Create("UIPadding", {PaddingTop = UDim.new(0,10), PaddingBottom = UDim.new(0,10), Parent = SettingsScroll})
 
--- ────────────────────────────────────────────────────────────────
--- Tab System
--- ────────────────────────────────────────────────────────────────
-
+--- Tab System (FIXED: Now appears right after header) ---
 local TabBar = Instance.new("Frame")
 TabBar.Name = "TabBar"
-TabBar.Size = UDim2.new(1, 0, 0, 40)
-TabBar.Position = UDim2.new(0, 0, 0, 50)
+TabBar.Size = UDim2.new(1, 0, 0, 45)
+TabBar.Position = UDim2.new(0, 0, 0, 50)  -- Right after header
 TabBar.BackgroundColor3 = CurrentTheme.Header
 TabBar.BackgroundTransparency = 0.4
 TabBar.BorderSizePixel = 0
@@ -238,6 +235,7 @@ TabBar.Parent = MainFrame
 Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = TabBar})
 local tabStroke = Create("UIStroke", {Thickness = 1.5, Transparency = 0.4, Parent = TabBar})
 ApplyGradient(tabStroke)
+table.insert(Registry.Headers, TabBar)
 
 local TabLayout = Instance.new("UIListLayout")
 TabLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -246,115 +244,19 @@ TabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 TabLayout.Padding = UDim.new(0, 8)
 TabLayout.Parent = TabBar
 
--- We'll store tab buttons & their pages here
+-- Store tabs & active tab
 local Tabs = {}
 local ActiveTab = nil
 
--- Container that will hold all tab pages (instead of putting everything directly in Scroll)
+-- Container for all tab pages
 local PagesContainer = Instance.new("Frame")
 PagesContainer.Name = "Pages"
-PagesContainer.Size = UDim2.new(1, 0, 1, -90)          -- -50 header -40 tabbar
-PagesContainer.Position = UDim2.new(0, 0, 0, 90)
+PagesContainer.Size = UDim2.new(1, 0, 1, -95)  -- Account for header (50) + tabs (45)
+PagesContainer.Position = UDim2.new(0, 0, 0, 95)
 PagesContainer.BackgroundTransparency = 1
 PagesContainer.ClipsDescendants = true
 PagesContainer.Parent = MainFrame
 
--- Replace the old Scroll with per-tab scrolls later
--- (we no longer use the global Scroll for content)
-
--- ────────────────────────────────────────────────────────────────
--- Tab Creation Function
--- ────────────────────────────────────────────────────────────────
-
-function XENO:AddTab(name, icon)
-    -- Tab button
-    local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(0, 110, 0, 32)
-    tabButton.BackgroundColor3 = CurrentTheme.SwitchOff
-    tabButton.BackgroundTransparency = 0.5
-    tabButton.AutoButtonColor = false
-    tabButton.Font = Enum.Font.GothamBold
-    tabButton.Text = (icon or "") .. "  " .. name
-    tabButton.TextColor3 = CurrentTheme.Text
-    tabButton.TextSize = 14
-    tabButton.Parent = TabBar
-    
-    Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = tabButton})
-    local tabStroke = Create("UIStroke", {Thickness = 1.5, Parent = tabButton})
-    ApplyGradient(tabStroke)
-    
-    -- Tab page (ScrollingFrame)
-    local page = Instance.new("ScrollingFrame")
-    page.Name = name .. "Page"
-    page.Size = UDim2.new(1, 0, 1, 0)
-    page.BackgroundTransparency = 1
-    page.BorderSizePixel = 0
-    page.ScrollBarThickness = 3
-    page.ScrollingDirection = Enum.ScrollingDirection.Y
-    page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    page.CanvasSize = UDim2.new(0,0,0,0)
-    page.Visible = false
-    page.Parent = PagesContainer
-    
-    local pageLayout = Instance.new("UIListLayout")
-    pageLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    pageLayout.Padding = UDim.new(0, 10)
-    pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    pageLayout.Parent = page
-    
-    Instance.new("UIPadding", {
-        PaddingTop = UDim.new(0,12),
-        PaddingBottom = UDim.new(0,20),
-        PaddingLeft = UDim.new(0,8),
-        PaddingRight = UDim.new(0,8),
-        Parent = page
-    })
-    
-    -- Tab switching logic
-    local function activate()
-        if ActiveTab == tabButton then return end
-        
-        -- deactivate old tab
-        if ActiveTab then
-            TweenService:Create(ActiveTab, TweenInfo.new(0.25), {
-                BackgroundColor3 = CurrentTheme.SwitchOff,
-                BackgroundTransparency = 0.5
-            }):Play()
-            ActiveTab:GetChildren()[1].Transparency = 0.4   -- stroke
-            
-            -- hide old page
-            local oldPage = PagesContainer:FindFirstChild(ActiveTab.Text:match("%S+$") .. "Page")
-            if oldPage then oldPage.Visible = false end
-        end
-        
-        -- activate new
-        TweenService:Create(tabButton, TweenInfo.new(0.25), {
-            BackgroundColor3 = CurrentTheme.Accent1,
-            BackgroundTransparency = 0.15
-        }):Play()
-        tabStroke.Transparency = 0
-        
-        page.Visible = true
-        ActiveTab = tabButton
-    end
-    
-    tabButton.MouseButton1Click:Connect(activate)
-    
-    -- store for later reference if needed
-    table.insert(Tabs, {
-        Button = tabButton,
-        Page = page,
-        Name = name
-    })
-    
-    -- Auto-activate first tab
-    if not ActiveTab then
-        activate()
-    end
-    
-    -- Return the page so user can add elements to it
-    return page
-end
 
 -- Color Picker Variables
 local CP_H, CP_S, CP_V = 0.6, 1, 1
