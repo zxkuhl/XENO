@@ -507,7 +507,7 @@ ToggleBtn.MouseButton1Click:Connect(ToggleUI)
 
 
 -- XENO promo notification (5 minutes after load)
-task.delay(10, function()
+task.delay(300, function()
 	if XENO and XENO.Notify then
 		XENO:Notify(
 			"XENO LIBRARY",
