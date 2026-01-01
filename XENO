@@ -509,7 +509,7 @@ ToggleBtn.MouseButton1Click:Connect(ToggleUI)
 --[[ ==========================================
      SECTION: USAGE EXAMPLES
      ========================================== ]]
-
+--[[ 
 XENO:AddSearchBar()
 
 -- 1. NORMAL FEATURES SECTION
@@ -557,7 +557,7 @@ end, true)
 
 XENO:AddKeybind("Toggle Interface", Enum.KeyCode.RightControl, function()
     ToggleUI()
-end, true)
+end, true) ]]
 
 
 --- Start Sequence ---
