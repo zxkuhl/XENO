@@ -511,7 +511,7 @@ task.delay(10, function()
 	if XENO and XENO.Notify then
 		XENO:Notify(
 			"XENO LIBRARY",
-			"Enjoying this library?\nMake your own at https://discord.gg/KPUPp4m9pJ",
+			"Enjoying this Script library?\nMake your own at https://discord.gg/KPUPp4m9pJ",
 			6
 		)
 	end
