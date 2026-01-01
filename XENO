@@ -223,41 +223,6 @@ local SettingsScroll = Create("ScrollingFrame", {Size = UDim2.new(1, 0, 1, 0), B
 local SettingsLayout = Create("UIListLayout", {Parent = SettingsScroll, HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10)})
 Create("UIPadding", {PaddingTop = UDim.new(0,10), PaddingBottom = UDim.new(0,10), Parent = SettingsScroll})
 
---- Tab System (FIXED: Now appears right after header) ---
-local TabBar = Instance.new("Frame")
-TabBar.Name = "TabBar"
-TabBar.Size = UDim2.new(1, 0, 0, 45)
-TabBar.Position = UDim2.new(0, 0, 0, 50)  -- Right after header
-TabBar.BackgroundColor3 = CurrentTheme.Header
-TabBar.BackgroundTransparency = 0.4
-TabBar.BorderSizePixel = 0
-TabBar.Parent = MainFrame
-Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = TabBar})
-local tabStroke = Create("UIStroke", {Thickness = 1.5, Transparency = 0.4, Parent = TabBar})
-ApplyGradient(tabStroke)
-table.insert(Registry.Headers, TabBar)
-
-local TabLayout = Instance.new("UIListLayout")
-TabLayout.FillDirection = Enum.FillDirection.Horizontal
-TabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-TabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-TabLayout.Padding = UDim.new(0, 8)
-TabLayout.Parent = TabBar
-
--- Store tabs & active tab
-local Tabs = {}
-local ActiveTab = nil
-
--- Container for all tab pages
-local PagesContainer = Instance.new("Frame")
-PagesContainer.Name = "Pages"
-PagesContainer.Size = UDim2.new(1, 0, 1, -95)  -- Account for header (50) + tabs (45)
-PagesContainer.Position = UDim2.new(0, 0, 0, 95)
-PagesContainer.BackgroundTransparency = 1
-PagesContainer.ClipsDescendants = true
-PagesContainer.Parent = MainFrame
-
-
 -- Color Picker Variables
 local CP_H, CP_S, CP_V = 0.6, 1, 1
 local ColorBox, Cursor, BrightnessBar -- Forward declarations
