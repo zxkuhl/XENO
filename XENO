@@ -559,6 +559,48 @@ function XENO:AddTextBox(title, placeholder, defaultText, callback, notification
     return Box
 end
 
+function XENO:AddParagraph(text)
+    local Frame = Create("Frame", {
+        Size = UDim2.new(0.9, 0, 0, 10), -- height auto-calculated
+        BackgroundColor3 = CurrentTheme.Header,
+        BackgroundTransparency = 0.6,
+        BorderSizePixel = 0,
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Parent = Scroll
+    })
+    SetOrder(Frame)
+    table.insert(Registry.Headers, Frame)
+
+    Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Frame})
+    local Stroke = Create("UIStroke", {Thickness = 1.5, Parent = Frame})
+    ApplyGradient(Stroke)
+
+    local Padding = Create("UIPadding", {
+        PaddingTop = UDim.new(0, 10),
+        PaddingBottom = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 15),
+        PaddingRight = UDim.new(0, 15),
+        Parent = Frame
+    })
+
+    local Label = Create("TextLabel", {
+        Name = "Paragraph",
+        Text = text,
+        Font = Enum.Font.Gotham,
+        TextSize = 13,
+        TextColor3 = CurrentTheme.Text,
+        TextWrapped = true,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Parent = Frame
+    })
+
+    return Label
+end
+
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 420, 0, 650) end end
 local function ToggleUI()
