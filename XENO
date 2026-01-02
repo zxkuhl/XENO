@@ -484,6 +484,81 @@ function XENO:AddDropdown(name, options, default, callback, notificationOnIntera
     end
 end
 
+function XENO:AddTextBox(title, placeholder, defaultText, callback, notificationOnInteract)
+    local Frame = Create("Frame", {
+        Size = UDim2.new(0.9, 0, 0, 45),
+        BackgroundColor3 = CurrentTheme.Header,
+        BackgroundTransparency = 0.5,
+        BorderSizePixel = 0,
+        Parent = Scroll
+    })
+    SetOrder(Frame)
+    table.insert(Registry.Headers, Frame)
+
+    Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Frame})
+    local Stroke = Create("UIStroke", {Thickness = 1.5, Parent = Frame})
+    ApplyGradient(Stroke)
+
+    -- Title
+    Create("TextLabel", {
+        Name = "ComponentTitle",
+        Text = title,
+        Font = Enum.Font.GothamBold,
+        TextSize = 13,
+        TextColor3 = CurrentTheme.Text,
+        Size = UDim2.new(0.4, 0, 1, 0),
+        Position = UDim2.new(0, 15, 0, 0),
+        BackgroundTransparency = 1,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = Frame
+    })
+
+    -- TextBox
+    local Box = Create("TextBox", {
+        Size = UDim2.new(0.5, 0, 0, 28),
+        Position = UDim2.new(1, -15, 0.5, -14),
+        AnchorPoint = Vector2.new(1, 0),
+        BackgroundColor3 = CurrentTheme.Background,
+        BackgroundTransparency = 0.3,
+        Text = defaultText or "",
+        PlaceholderText = placeholder or "Enter text...",
+        PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
+        TextColor3 = CurrentTheme.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 12,
+        ClearTextOnFocus = false,
+        Parent = Frame
+    })
+
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Box})
+    local BoxStroke = Create("UIStroke", {Thickness = 1, Parent = Box})
+    ApplyGradient(BoxStroke)
+
+    -- Focus visuals
+    Box.Focused:Connect(function()
+        TweenService:Create(Frame, TWEEN_FAST, {BackgroundTransparency = 0.2}):Play()
+    end)
+
+    Box.FocusLost:Connect(function(enterPressed)
+        TweenService:Create(Frame, TWEEN_FAST, {BackgroundTransparency = 0.5}):Play()
+        if enterPressed then
+            local text = Box.Text
+            if callback then
+                callback(text)
+            end
+            if notificationOnInteract then
+                XENO:Notify(
+                    "Text Input",
+                    title .. ": " .. (text ~= "" and text or "Empty"),
+                    2
+                )
+            end
+        end
+    end)
+
+    return Box
+end
+
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 420, 0, 650) end end
 local function ToggleUI()
