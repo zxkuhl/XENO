@@ -560,6 +560,108 @@ function XENO:AddTextBox(title, placeholder, defaultText, callback, notification
 end
 
 
+– Add this to your XENO library code, after all the other component functions
+
+— KEY SYSTEM COMPONENT —
+local OriginalFunctions = {}
+local KeyVerified = false
+local PendingQueue = {}
+
+– List of functions to intercept
+local FunctionsToIntercept = {
+“AddHeader”, “AddLabel”, “AddButton”, “AddSwitch”,
+“AddSlider”, “AddDropdown”, “AddKeybind”, “AddTextBox”, “AddSearchBar”
+}
+
+– Key System function
+function XENO:KeySystem(config)
+local correctKey = config.Key or “DefaultKey123”
+local keyLink = config.KeyLink or “discord.gg/example”
+local keyMessage = config.KeyMessage or “Get the key from our Discord!”
+
+```
+-- Save original functions
+for _, funcName in ipairs(FunctionsToIntercept) do
+    OriginalFunctions[funcName] = XENO[funcName]
+end
+
+-- Create wrapper that queues commands until key is verified
+local function CreateWrapper(funcName)
+    return function(...)
+        if KeyVerified then
+            return OriginalFunctions[funcName](...)
+        else
+            table.insert(PendingQueue, {func = funcName, args = {...}})
+        end
+    end
+end
+
+-- Override all functions to queue them
+for _, funcName in ipairs(FunctionsToIntercept) do
+    XENO[funcName] = CreateWrapper(funcName)
+end
+
+-- Variable for key input
+local keyInput = ""
+
+-- Build Key System UI using original functions
+OriginalFunctions.AddHeader("🔑 KEY SYSTEM")
+OriginalFunctions.AddLabel(keyMessage)
+OriginalFunctions.AddLabel("Discord: " .. keyLink)
+
+OriginalFunctions.AddButton("Copy Discord Link", function()
+    if setclipboard then
+        setclipboard("https://" .. keyLink)
+        XENO:Notify("COPIED", "Discord link copied to clipboard!", 2)
+    else
+        XENO:Notify("ERROR", "Clipboard not supported", 2)
+    end
+end, true)
+
+OriginalFunctions.AddTextBox(
+    "Enter Key",
+    "Type your key here...",
+    "",
+    function(text)
+        keyInput = text
+    end,
+    false
+)
+
+OriginalFunctions.AddButton("Submit Key", function()
+    if keyInput == correctKey then
+        KeyVerified = true
+        XENO:Notify("SUCCESS", "Key verified! Loading script...", 3)
+        
+        -- Wait a moment for visual feedback
+        wait(0.5)
+        
+        -- Restore original functions
+        for _, funcName in ipairs(FunctionsToIntercept) do
+            XENO[funcName] = OriginalFunctions[funcName]
+        end
+        
+        -- Execute all queued commands
+        for _, command in ipairs(PendingQueue) do
+            OriginalFunctions[command.func](unpack(command.args))
+        end
+        
+        -- Clear the queue
+        PendingQueue = {}
+        
+        XENO:Notify("LOADED", "Script ready to use!", 2)
+    else
+        XENO:Notify("ERROR", "Incorrect key! Try again.", 3)
+        keyInput = ""
+    end
+end, false)
+
+-- Add separator
+OriginalFunctions.AddLabel("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+```
+
+end
+
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 420, 0, 650) end end
 local function ToggleUI()
