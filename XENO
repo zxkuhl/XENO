@@ -559,6 +559,240 @@ end)
 return Box
 end
 
+function XENO:AddMultiDropdown(name, options, defaults, callback, notificationOnInteract)
+local DropdownHeight = 50
+local ItemHeight = 35
+local IsExpanded = false
+local SelectedOptions = {}
+
+```
+-- Initialize with defaults
+if defaults then
+    for _, default in ipairs(defaults) do
+        SelectedOptions[default] = true
+    end
+end
+
+local Container = Create("Frame", {
+    Size = UDim2.new(0.9, 0, 0, DropdownHeight),
+    BackgroundColor3 = CurrentTheme.Header,
+    BackgroundTransparency = 0,
+    BorderSizePixel = 0,
+    ClipsDescendants = true,
+    Parent = Scroll
+})
+SetOrder(Container)
+table.insert(Registry.Headers, Container)
+Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Container})
+
+local HeaderBtn = Create("TextButton", {
+    Size = UDim2.new(1, 0, 0, DropdownHeight),
+    BackgroundTransparency = 1,
+    Text = "",
+    Parent = Container
+})
+
+Create("TextLabel", {
+    Name = "ComponentTitle",
+    Text = name,
+    Font = Enum.Font.GothamBold,
+    TextSize = 13,
+    TextColor3 = CurrentTheme.Text,
+    Size = UDim2.new(0.4, 0, 1, 0),
+    Position = UDim2.new(0, 15, 0, 0),
+    BackgroundTransparency = 1,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    Parent = HeaderBtn
+})
+
+local PreviewBox = Create("Frame", {
+    Size = UDim2.new(0.35, 0, 0.6, 0),
+    Position = UDim2.new(0.55, 0, 0.2, 0),
+    BackgroundColor3 = CurrentTheme.Background,
+    BackgroundTransparency = 0.5,
+    Parent = HeaderBtn
+})
+Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = PreviewBox})
+local PBS = Create("UIStroke", {Thickness = 1, Parent = PreviewBox})
+ApplyGradient(PBS)
+
+-- Function to update preview text
+local function UpdatePreview()
+    local count = 0
+    for _ in pairs(SelectedOptions) do
+        count = count + 1
+    end
+    return count == 0 and "None" or tostring(count) .. " selected"
+end
+
+local SelectedLabel = Create("TextLabel", {
+    Text = UpdatePreview(),
+    Font = Enum.Font.GothamBold,
+    TextSize = 12,
+    TextColor3 = CurrentTheme.Accent1,
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundTransparency = 1,
+    Parent = PreviewBox
+})
+table.insert(Registry.Accents, SelectedLabel)
+
+local Arrow = Create("TextLabel", {
+    Text = "v",
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextColor3 = CurrentTheme.Text,
+    Size = UDim2.new(0, 30, 0, 30),
+    Position = UDim2.new(1, -35, 0.5, -15),
+    BackgroundTransparency = 1,
+    Parent = HeaderBtn
+})
+
+local ListFrame = Create("Frame", {
+    Size = UDim2.new(1, 0, 0, #options * ItemHeight),
+    Position = UDim2.new(0, 0, 0, DropdownHeight),
+    BackgroundTransparency = 1,
+    Visible = false,
+    Parent = Container
+})
+Create("UIListLayout", {
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    Padding = UDim.new(0, 5),
+    Parent = ListFrame
+})
+Create("UIPadding", {PaddingTop = UDim.new(0, 5), Parent = ListFrame})
+
+local function Toggle()
+    IsExpanded = not IsExpanded
+    local TargetHeight = IsExpanded and (DropdownHeight + (#options * ItemHeight) + (#options * 5) + 5) or DropdownHeight
+    local TargetRot = IsExpanded and 180 or 0
+    if IsExpanded then ListFrame.Visible = true end
+    
+    TweenService:Create(Container, TWEEN_DROPDOWN, {Size = UDim2.new(0.9, 0, 0, TargetHeight)}):Play()
+    TweenService:Create(Arrow, TWEEN_QUINT, {Rotation = TargetRot}):Play()
+    
+    if IsExpanded then
+        for i, child in pairs(ListFrame:GetChildren()) do
+            if child:IsA("Frame") then
+                child.BackgroundTransparency = 1
+                local btn = child:FindFirstChildOfClass("TextButton")
+                local checkmark = child:FindFirstChild("Checkmark")
+                if btn then btn.TextTransparency = 1 end
+                if checkmark then checkmark.TextTransparency = 1 end
+                TweenService:Create(child, TweenInfo.new(0.6 + (i*0.08), Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundTransparency = 0.4}):Play()
+                if btn then TweenService:Create(btn, TweenInfo.new(0.6 + (i*0.08)), {TextTransparency = 0}):Play() end
+                if checkmark then TweenService:Create(checkmark, TweenInfo.new(0.6 + (i*0.08)), {TextTransparency = 0}):Play() end
+            end
+        end
+    else
+        wait(0.2)
+        if not IsExpanded then ListFrame.Visible = false end
+    end
+end
+
+HeaderBtn.MouseButton1Click:Connect(Toggle)
+
+-- Create option items
+for i, option in ipairs(options) do
+    local ItemContainer = Create("Frame", {
+        Size = UDim2.new(0.95, 0, 0, 30),
+        BackgroundColor3 = CurrentTheme.Background,
+        BackgroundTransparency = 0.4,
+        BorderSizePixel = 0,
+        Parent = ListFrame
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ItemContainer})
+    local ItemStroke = Create("UIStroke", {Thickness = 1, Parent = ItemContainer})
+    ApplyGradient(ItemStroke)
+    
+    -- Checkmark indicator
+    local Checkmark = Create("TextLabel", {
+        Name = "Checkmark",
+        Text = SelectedOptions[option] and "✓" or "",
+        Font = Enum.Font.GothamBold,
+        TextSize = 16,
+        TextColor3 = CurrentTheme.Accent1,
+        Size = UDim2.new(0, 25, 1, 0),
+        Position = UDim2.new(0, 5, 0, 0),
+        BackgroundTransparency = 1,
+        Parent = ItemContainer
+    })
+    table.insert(Registry.Accents, Checkmark)
+    
+    local OptBtn = Create("TextButton", {
+        Size = UDim2.new(1, -30, 1, 0),
+        Position = UDim2.new(0, 30, 0, 0),
+        BackgroundTransparency = 1,
+        Text = option,
+        Font = Enum.Font.GothamBold,
+        TextSize = 12,
+        TextColor3 = CurrentTheme.Text,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = ItemContainer
+    })
+    
+    OptBtn.MouseEnter:Connect(function()
+        TweenService:Create(ItemContainer, TWEEN_FAST, {BackgroundTransparency = 0}):Play()
+        TweenService:Create(OptBtn, TWEEN_FAST, {TextColor3 = CurrentTheme.Accent1}):Play()
+    end)
+    
+    OptBtn.MouseLeave:Connect(function()
+        TweenService:Create(ItemContainer, TWEEN_FAST, {BackgroundTransparency = 0.4}):Play()
+        TweenService:Create(OptBtn, TWEEN_FAST, {TextColor3 = CurrentTheme.Text}):Play()
+    end)
+    
+    OptBtn.MouseButton1Click:Connect(function()
+        -- Toggle selection
+        SelectedOptions[option] = not SelectedOptions[option]
+        
+        -- Animate click
+        TweenService:Create(ItemContainer, TWEEN_CLICK, {Size = UDim2.new(0.9, 0, 0, 28)}):Play()
+        wait(0.1)
+        TweenService:Create(ItemContainer, TWEEN_FAST, {Size = UDim2.new(0.95, 0, 0, 30)}):Play()
+        
+        -- Update checkmark
+        Checkmark.Text = SelectedOptions[option] and "✓" or ""
+        
+        -- Update preview
+        SelectedLabel.Text = UpdatePreview()
+        
+        -- Build selected array for callback
+        local selected = {}
+        for opt, isSelected in pairs(SelectedOptions) do
+            if isSelected then
+                table.insert(selected, opt)
+            end
+        end
+        
+        -- Trigger callback
+        if callback then
+            callback(selected)
+        end
+        
+        if notificationOnInteract then
+            XENO:Notify(
+                "Multi-Dropdown",
+                option .. " " .. (SelectedOptions[option] and "added" or "removed"),
+                1.5
+            )
+        end
+    end)
+end
+
+-- Return function to get current selections
+return function()
+    local selected = {}
+    for opt, isSelected in pairs(SelectedOptions) do
+        if isSelected then
+            table.insert(selected, opt)
+        end
+    end
+    return selected
+end
+```
+
+end
+
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 420, 0, 650) end end
 local function ToggleUI()
