@@ -561,7 +561,7 @@ end
 
 
 --- Squircle Toggle ---
-local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 420, 0, 650) end end
+local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 650, 0, 650) end end
 local function ToggleUI()
     if IsAnimating then return end; IsAnimating = true; IsOpen = not IsOpen
     TweenService:Create(ToggleIcon, TWEEN_TOGGLE_OPEN, {Rotation = IsOpen and 180 or 0}):Play()
