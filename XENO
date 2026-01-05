@@ -644,62 +644,42 @@ end
 
 
 
-function XENO:AddMultiSelectDropdown(name, options, defaultSelections, callback, notificationOnInteract)
-    defaultSelections = defaultSelections or {}
+function XENO:AddMultiSelectDropdown(name, options, default, callback, notificationOnInteract)
     local DropdownHeight = 50
     local ItemHeight = 35
     local IsExpanded = false
-    local SelectedItems = {}
-    for _, v in pairs(defaultSelections) do SelectedItems[v] = true end
+    local Selected = {}
+    for _, def in ipairs(default or {}) do Selected[def] = true end
 
-    -- Main Container
-    local Container = Create("Frame", {
-        Size = UDim2.new(0.9, 0, 0, DropdownHeight),
-        BackgroundColor3 = CurrentTheme.Header,
-        BackgroundTransparency = 0,
-        BorderSizePixel = 0,
-        ClipsDescendants = true,
-        Parent = Scroll
-    }); SetOrder(Container); table.insert(Registry.Headers, Container)
+    local Container = Create("Frame", {Size = UDim2.new(0.9, 0, 0, DropdownHeight), BackgroundColor3 = CurrentTheme.Header, BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Parent = Scroll}); SetOrder(Container); table.insert(Registry.Headers, Container)
     Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Container})
 
-    -- Header Button
     local HeaderBtn = Create("TextButton", {Size = UDim2.new(1, 0, 0, DropdownHeight), BackgroundTransparency = 1, Text = "", Parent = Container})
-    Create("TextLabel", {Name = "ComponentTitle", Text = name, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = CurrentTheme.Text, Size = UDim2.new(0.5, 0, 1, 0), Position = UDim2.new(0, 15, 0, 0), BackgroundTransparency = 1, TextXAlignment = Enum.TextXAlignment.Left, Parent = HeaderBtn})
-    local PreviewBox = Create("Frame", {Size = UDim2.new(0.4, 0, 0.6, 0), Position = UDim2.new(0.55, 0, 0.2, 0), BackgroundColor3 = CurrentTheme.Background, BackgroundTransparency = 0.5, Parent = HeaderBtn})
-    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = PreviewBox}); Create("UIStroke", {Thickness = 1, Parent = PreviewBox}); ApplyGradient(PreviewBox)
-    local SelectedLabel = Create("TextLabel", {Text = table.concat(defaultSelections, ", ") or "...", Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = CurrentTheme.Accent1, Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Parent = PreviewBox}); table.insert(Registry.Accents, SelectedLabel)
+    local TitleLabel = Create("TextLabel", {Text = name, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = CurrentTheme.Text, Size = UDim2.new(0.4, 0, 1, 0), Position = UDim2.new(0, 15, 0, 0), BackgroundTransparency = 1, TextXAlignment = Enum.TextXAlignment.Left, Parent = HeaderBtn})
+    local PreviewBox = Create("Frame", {Size = UDim2.new(0.35, 0, 0.6, 0), Position = UDim2.new(0.55, 0, 0.2, 0), BackgroundColor3 = CurrentTheme.Background, BackgroundTransparency = 0.5, Parent = HeaderBtn})
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = PreviewBox}); local PBS = Create("UIStroke", {Thickness = 1, Parent = PreviewBox}); ApplyGradient(PBS)
+    local SelectedLabel = Create("TextLabel", {Text = table.concat(default or {}, ", "), Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = CurrentTheme.Accent1, Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Parent = PreviewBox}); table.insert(Registry.Accents, SelectedLabel)
     local Arrow = Create("TextLabel", {Text = "v", Font = Enum.Font.GothamBold, TextSize = 14, TextColor3 = CurrentTheme.Text, Size = UDim2.new(0, 30, 0, 30), Position = UDim2.new(1, -35, 0.5, -15), BackgroundTransparency = 1, Parent = HeaderBtn})
 
-    -- Options List
     local ListFrame = Create("Frame", {Size = UDim2.new(1, 0, 0, #options * ItemHeight), Position = UDim2.new(0, 0, 0, DropdownHeight), BackgroundTransparency = 1, Visible = false, Parent = Container})
     Create("UIListLayout", {SortOrder = Enum.SortOrder.LayoutOrder, HorizontalAlignment = Enum.HorizontalAlignment.Center, Padding = UDim.new(0, 5), Parent = ListFrame}); Create("UIPadding", {PaddingTop = UDim.new(0, 5), Parent = ListFrame})
 
+    -- Create each option button
     for i, opt in ipairs(options) do
-        local OptionFrame = Create("Frame", {Size = UDim2.new(0.95, 0, 0, ItemHeight), BackgroundTransparency = 1, Parent = ListFrame})
-        local CheckBtn = Create("TextButton", {Text = "", Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 10, 0.5, -10), BackgroundColor3 = CurrentTheme.SwitchOff, AutoButtonColor = false, Parent = OptionFrame})
-        Create("UICorner", {CornerRadius = UDim.new(1,0), Parent = CheckBtn})
-        local Circle = Create("Frame", {Size = UDim2.new(0, 12, 0, 12), Position = UDim2.new(0, 4, 0.5, -6), BackgroundColor3 = Color3.new(1,1,1), Parent = CheckBtn}); Create("UICorner", {CornerRadius = UDim.new(1,0), Parent = Circle})
-        local Label = Create("TextLabel", {Text = opt, Font = Enum.Font.Gotham, TextSize = 13, TextColor3 = CurrentTheme.Text, BackgroundTransparency = 1, Position = UDim2.new(0, 40, 0, 0), Size = UDim2.new(1, -45, 1, 0), TextXAlignment = Enum.TextXAlignment.Left, Parent = OptionFrame})
-
-        local Selected = SelectedItems[opt] or false
-        if Selected then
-            Circle.BackgroundColor3 = CurrentTheme.SwitchOn
-            CheckBtn.BackgroundColor3 = CurrentTheme.SwitchOn
-        end
-
-        CheckBtn.MouseButton1Click:Connect(function()
-            Selected = not Selected
-            SelectedItems[opt] = Selected or nil
-            Circle.BackgroundColor3 = Selected and CurrentTheme.SwitchOn or Color3.new(1,1,1)
-            CheckBtn.BackgroundColor3 = Selected and CurrentTheme.SwitchOn or CurrentTheme.SwitchOff
-            SelectedLabel.Text = table.concat(table.keys(SelectedItems), ", ") ~= "" and table.concat(table.keys(SelectedItems), ", ") or "..."
-            if callback then callback(table.keys(SelectedItems)) end
-            if notificationOnInteract then XENO:Notify("MultiSelect", opt .. (Selected and " selected" or " deselected"), 1.5) end
+        local Item = Create("Frame", {Size = UDim2.new(1, -10, 0, ItemHeight), BackgroundTransparency = 1, Parent = ListFrame})
+        local Btn = Create("TextButton", {Text = opt, Font = Enum.Font.Gotham, TextSize = 13, TextColor3 = CurrentTheme.Text, Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = CurrentTheme.Header, AutoButtonColor = false, BorderSizePixel = 0, Parent = Item}); Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = Btn}); table.insert(Registry.Headers, Btn)
+        local Check = Create("TextLabel", {Text = "✓", Font = Enum.Font.GothamBold, TextSize = 14, TextColor3 = CurrentTheme.Accent1, Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(1, -25, 0.5, -10), BackgroundTransparency = 1, Visible = Selected[opt], Parent = Btn}); table.insert(Registry.Accents, Check)
+        Btn.MouseButton1Click:Connect(function()
+            Selected[opt] = not Selected[opt]
+            Check.Visible = Selected[opt]
+            local selList = {}
+            for k,v in pairs(Selected) do if v then table.insert(selList, k) end end
+            SelectedLabel.Text = table.concat(selList, ", ")
+            if callback then callback(selList) end
+            if notificationOnInteract then XENO:Notify(name, "Selected: " .. table.concat(selList, ", "), 2) end
         end)
     end
 
-    -- Toggle Expand/Collapse
     local function Toggle()
         IsExpanded = not IsExpanded
         local TargetHeight = IsExpanded and (DropdownHeight + (#options * ItemHeight) + (#options * 5) + 5) or DropdownHeight
@@ -707,13 +687,11 @@ function XENO:AddMultiSelectDropdown(name, options, defaultSelections, callback,
         if IsExpanded then ListFrame.Visible = true end
         TweenService:Create(Container, TWEEN_DROPDOWN, {Size = UDim2.new(0.9, 0, 0, TargetHeight)}):Play()
         TweenService:Create(Arrow, TWEEN_QUINT, {Rotation = TargetRot}):Play()
-        if not IsExpanded then
-            task.delay(0.25, function() if not IsExpanded then ListFrame.Visible = false end end)
-        end
+        if not IsExpanded then task.wait(0.2); ListFrame.Visible = false end
     end
+
     HeaderBtn.MouseButton1Click:Connect(Toggle)
 end
-
 
 
 --- Squircle Toggle ---
