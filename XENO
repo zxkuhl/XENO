@@ -560,6 +560,89 @@ return Box
 end
 
 
+
+function XENO:AddStatusBar()
+    if ScreenGui:FindFirstChild("XENOStatusBar") then
+        return
+    end
+
+    --- Status Bar ---
+    local StatusBar = Create("Frame", {
+        Name = "XENOStatusBar",
+        Size = UDim2.new(0, 320, 0, 32),
+        AnchorPoint = Vector2.new(1, 0),
+        Position = UDim2.new(1, -12, 0, 12),
+        BackgroundColor3 = CurrentTheme.Header,
+        BackgroundTransparency = 0.15,
+        BorderSizePixel = 0,
+        ZIndex = 1500,
+        Parent = ScreenGui
+    })
+
+    MakeDraggable(StatusBar)
+    Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = StatusBar})
+
+    local SBStroke = Create("UIStroke", {
+        Thickness = 2,
+        Parent = StatusBar
+    })
+    ApplyGradient(SBStroke)
+    table.insert(Registry.Strokes, SBStroke)
+    table.insert(Registry.Headers, StatusBar)
+
+    -- Text
+    local StatusText = Create("TextLabel", {
+        Size = UDim2.new(1, -20, 1, 0),
+        Position = UDim2.new(0, 10, 0, 0),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextColor3 = CurrentTheme.Text,
+        ZIndex = 1501,
+        Parent = StatusBar
+    })
+    table.insert(Registry.Accents, StatusText)
+
+    -- Click = toggle UI
+    StatusBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            ToggleUI()
+        end
+    end)
+
+    --- FPS Counter ---
+    local fps = 60
+    local frames = 0
+    local lastTick = tick()
+
+    RunService.RenderStepped:Connect(function()
+        frames += 1
+        local now = tick()
+        if now - lastTick >= 1 then
+            fps = frames
+            frames = 0
+            lastTick = now
+        end
+    end)
+
+    --- Time Update Loop ---
+    task.spawn(function()
+        while StatusBar.Parent do
+            StatusText.Text = string.format(
+                "XENO 1.0   %d FPS | %s | %s",
+                fps,
+                os.date("%I:%M %p"),
+                os.date("%m/%d")
+            )
+            task.wait(1)
+        end
+    end)
+
+    return StatusBar
+end
+
+
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 650, 0, 650) end end
 local function ToggleUI()
