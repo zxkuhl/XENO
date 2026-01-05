@@ -15,6 +15,7 @@ local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -566,6 +567,7 @@ function XENO:AddStatusBar()
         return
     end
 
+
     --- Status Bar ---
     local StatusBar = Create("Frame", {
         Name = "XENOStatusBar",
@@ -626,15 +628,24 @@ function XENO:AddStatusBar()
         end
     end)
 
-    --- Time Update Loop ---
+    --- Ping ---
+    local ping = 0
+    local pingItem = Stats.Network.ServerStatsItem["Data Ping"]
+
+    --- Time / Status Update Loop ---
     task.spawn(function()
         while StatusBar.Parent do
+            -- Ping is reported in microseconds
+            ping = math.floor(pingItem:GetValue() / 1000)
+
             StatusText.Text = string.format(
-                "XENO 1.0   %d FPS | %s | %s",
+                "XENO    %d FPS | %d ms | %s | %s",
                 fps,
+                ping,
                 os.date("%I:%M %p"),
                 os.date("%m/%d")
             )
+
             task.wait(1)
         end
     end)
