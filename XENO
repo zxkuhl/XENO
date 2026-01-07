@@ -6,7 +6,7 @@
 ]] 
 
 --- Configuration ---
-local DiscordInvite = "https://discord.gg/KPUPp4m9pJ" ---you can change this to your own discord server ---
+local DiscordInvite = _G.XENO_DISCORD_INVITE or "https://discord.gg/KPUPp4m9pJ"
 
 --- Services ---
 local Players = game:GetService("Players")
