@@ -729,8 +729,6 @@ end)
 
 
 
-
-
 --- Start Sequence ---
 task.spawn(function()
     local IntroFrame = Create("Frame", {Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 2000, Parent = ScreenGui})
