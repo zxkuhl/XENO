@@ -730,14 +730,6 @@ end)
 
 
 
-XENO:Notify(
-   "Greetings, " .. displayName .. ".",
-    "Hello, " .. displayName .. ", thanks for choosing XENO library.",
-    8,
-    ""
-)
-
-
 
 --- Start Sequence ---
 task.spawn(function()
