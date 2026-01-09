@@ -732,7 +732,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local displayName = LocalPlayer.DisplayName or LocalPlayer.Name
 
-wait(6)
+
 
 XENO:Notify(
     "Greetings, " .. displayName .. ".",
