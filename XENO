@@ -727,18 +727,7 @@ task.delay(300, function()
 	end
 end)
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
-local displayName = LocalPlayer.DisplayName or LocalPlayer.Name
-
-
-
-XENO:Notify(
-    "Greetings, " .. displayName .. ".",
-    "Hello, " .. displayName .. ", thanks for choosing XENO library.",
-    8
-)
 
 --- Start Sequence ---
 task.spawn(function()
