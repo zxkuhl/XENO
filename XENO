@@ -728,8 +728,8 @@ task.delay(300, function()
 end)
 
 
--- XENO greeting notification (7 seconds after load)
-task.delay(7, function()
+-- XENO greeting notification (8 seconds after load)
+task.delay(8, function()
     if XENO and XENO.Notify then
         local LocalPlayer = Players.LocalPlayer
         local displayName = LocalPlayer.DisplayName or LocalPlayer.Name
