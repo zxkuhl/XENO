@@ -877,7 +877,15 @@ task.delay(1, function()
     end
 end)
 
-
+XENO:SaveConfig("DYS38JH9H", {
+    ThemeName = "Purple", -- current preset theme
+    CustomAccent = {
+        H = CP_H,
+        S = CP_S,
+        V = CP_V
+    },
+    GradientMode = CurrentTheme.IsGradient
+})
 --- Start Sequence ---
 task.spawn(function()
     local IntroFrame = Create("Frame", {Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 2000, Parent = ScreenGui})
