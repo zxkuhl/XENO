@@ -798,6 +798,37 @@ task.delay(1, function()
     end
 end)
 
+-- Add a config slot
+local config = XENO:AddConfig("DYS38JH9H")
+
+-- Function to save the current theme
+local function saveTheme()
+    -- Assuming XENO has a table like XENO.Theme or XENO.CurrentTheme
+    local currentTheme = XENO.CurrentTheme or "Purple" -- default to Purple
+    config:Save({
+        theme = currentTheme
+    })
+end
+
+-- Function to load the saved theme
+local function loadTheme()
+    local data = config:Load()
+    if data and data.theme then
+        -- Set the theme to the saved one
+        XENO:SetTheme(data.theme)
+    end
+end
+
+-- Load theme on start
+loadTheme()
+
+-- Example: Whenever user changes theme
+-- Wrap original SetTheme so it also saves automatically
+local oldSetTheme = XENO.SetTheme
+XENO.SetTheme = function(themeName)
+    oldSetTheme(themeName)
+    saveTheme()
+end
 
 --- Start Sequence ---
 task.spawn(function()
