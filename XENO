@@ -693,61 +693,140 @@ function XENO:AddMultiSelectDropdown(name, options, default, callback, notificat
     HeaderBtn.MouseButton1Click:Connect(Toggle)
 end
 
-function XENO:InitConfig()
+--// Configuration System ────────────────────────────────────────────────
+local ConfigSystem = {}
+do
     local HttpService = game:GetService("HttpService")
-    local Configs = {}
-
-    local ConfigFolder = "XENOConfigs"
-    if makefolder and not isfolder(ConfigFolder) then
-        makefolder(ConfigFolder)
-    end
-
-    local function getPath(name)
-        return ConfigFolder .. "/" .. name .. ".json"
-    end
-
-    local function saveConfig(name)
-        if not Configs[name] then return end
-        if writefile then
-            writefile(getPath(name), HttpService:JSONEncode(Configs[name]))
+    local Folder = "XENOConfigs"
+    
+    -- Registered config values (key → current value)
+    local RegisteredValues = {}
+    -- Default values (for reset / first time)
+    local DefaultValues = {}
+    
+    local function ensureFolder()
+        if not isfolder(Folder) then
+            makefolder(Folder)
         end
     end
-
-    local function loadConfig(name)
-        if isfile and isfile(getPath(name)) then
-            local raw = readfile(getPath(name))
-            local success, data = pcall(function()
-                return HttpService:JSONDecode(raw)
-            end)
-            if success and type(data) == "table" then
-                Configs[name] = data
-                return
+    
+    -- Register a config value (can be called multiple times, keeps last default)
+    function XENO:AddToConfig(key, defaultValue)
+        if RegisteredValues[key] == nil then
+            RegisteredValues[key] = defaultValue
+            DefaultValues[key] = defaultValue
+        end
+        -- Returns current value (useful after load)
+        return RegisteredValues[key]
+    end
+    
+    -- Get current value of registered config
+    function XENO:GetConfig(key)
+        return RegisteredValues[key]
+    end
+    
+    -- Set value (and optionally auto-save)
+    function XENO:SetConfig(key, value, autoSaveConfigName)
+        if RegisteredValues[key] ~= nil then
+            RegisteredValues[key] = value
+            
+            if autoSaveConfigName then
+                XENO:SaveConfig(autoSaveConfigName)
             end
         end
-        Configs[name] = {}
     end
-
-    function XENO:AddConfig(configName)
-        if not configName then return end
-        if not Configs[configName] then
-            loadConfig(configName)
+    
+    -- Save all registered values to a config file
+    function XENO:SaveConfig(name)
+        ensureFolder()
+        
+        local dataToSave = {}
+        for k, v in pairs(RegisteredValues) do
+            dataToSave[k] = v
+        end
+        
+        local success = pcall(function()
+            writefile(
+                Folder .. "/" .. tostring(name) .. ".json",
+                HttpService:JSONEncode(dataToSave)
+            )
+        end)
+        
+        return success
+    end
+    
+    -- Load config and update registered values
+    function XENO:LoadConfig(name)
+        local path = Folder .. "/" .. tostring(name) .. ".json"
+        if not isfile(path) then return false end
+        
+        local success, loaded = pcall(function()
+            return HttpService:JSONDecode(readfile(path))
+        end)
+        
+        if not success or type(loaded) ~= "table" then
+            return false
+        end
+        
+        local applied = 0
+        for key, value in pairs(loaded) do
+            if RegisteredValues[key] ~= nil then
+                RegisteredValues[key] = value
+                applied = applied + 1
+            end
+        end
+        
+        return applied > 0
+    end
+    
+    -- Reset all registered values to their defaults
+    function XENO:ResetToDefaults()
+        for key, def in pairs(DefaultValues) do
+            RegisteredValues[key] = def
         end
     end
-
-    function XENO:AddToConfig(configName, key, value)
-        if not configName or not key then return end
-        if not Configs[configName] then
-            XENO:AddConfig(configName)
+    
+    -- Get list of existing config files
+    function XENO:ListConfigs()
+        if not isfolder(Folder) then return {} end
+        local files = listfiles(Folder)
+        local configs = {}
+        for _, file in ipairs(files) do
+            if file:match("%.json$") then
+                local name = file:match("[^/\\]+%.json$")
+                name = name:sub(1, -6) -- remove .json
+                table.insert(configs, name)
+            end
         end
-        Configs[configName][key] = value
-        saveConfig(configName)
+        return configs
     end
-
-    function XENO:GetConfig(configName, key)
-        if not Configs[configName] then
-            XENO:AddConfig(configName)
-        end
-        return Configs[configName] and Configs[configName][key]
+    
+    -- Compatibility with your original method names (optional)
+    function XENO:Save(name, data)
+        warn("[XENO] :Save() is deprecated. Use :SaveConfig() instead")
+        ensureFolder()
+        local success = pcall(function()
+            writefile(Folder .. "/" .. tostring(name) .. ".json", HttpService:JSONEncode(data))
+        end)
+        return success
+    end
+    
+    function XENO:Load(name)
+        warn("[XENO] :Load() is deprecated. Use :LoadConfig() instead")
+        local path = Folder .. "/" .. tostring(name) .. ".json"
+        if not isfile(path) then return nil end
+        local s, r = pcall(function()
+            return HttpService:JSONDecode(readfile(path))
+        end)
+        return s and r
+    end
+    
+    function XENO:GetOrDefault(name, defaultTable)
+        warn("[XENO] :GetOrDefault() is deprecated. Use :LoadConfig() + :AddToConfig() instead")
+        local loaded = XENO:LoadConfig(name)
+        if loaded then return RegisteredValues end
+        XENO:SaveConfig(name)
+        return defaultTable
     end
 end
 --- Squircle Toggle ---
@@ -798,37 +877,6 @@ task.delay(1, function()
     end
 end)
 
--- Add a config slot
-local config = XENO:AddConfig("DYS38JH9H")
-
--- Function to save the current theme
-local function saveTheme()
-    -- Assuming XENO has a table like XENO.Theme or XENO.CurrentTheme
-    local currentTheme = XENO.CurrentTheme or "Purple" -- default to Purple
-    config:Save({
-        theme = currentTheme
-    })
-end
-
--- Function to load the saved theme
-local function loadTheme()
-    local data = config:Load()
-    if data and data.theme then
-        -- Set the theme to the saved one
-        XENO:SetTheme(data.theme)
-    end
-end
-
--- Load theme on start
-loadTheme()
-
--- Example: Whenever user changes theme
--- Wrap original SetTheme so it also saves automatically
-local oldSetTheme = XENO.SetTheme
-XENO.SetTheme = function(themeName)
-    oldSetTheme(themeName)
-    saveTheme()
-end
 
 --- Start Sequence ---
 task.spawn(function()
