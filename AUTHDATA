@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 return {
     LocalPlayer = Players.LocalPlayer,
     Blacklist = {
-        ["SomeUser"] = true,
+        ["EliRulz13"] = true,
         ["AnotherUser"] = true,
         ["BadActor123"] = true
     }
