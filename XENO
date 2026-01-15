@@ -693,6 +693,43 @@ function XENO:AddMultiSelectDropdown(name, options, default, callback, notificat
     HeaderBtn.MouseButton1Click:Connect(Toggle)
 end
 
+-- Config System
+local XENO = XENO or {}
+
+local ConfigFolder = "XENOConfig"
+
+-- Ensure the config folder exists
+local function ensureFolder()
+    if not isfolder(ConfigFolder) then
+        makefolder(ConfigFolder)
+    end
+end
+
+-- Create a new file
+function XENO:AddFile(fileName)
+    ensureFolder()
+    local filePath = ConfigFolder .. "/" .. fileName .. ".txt"
+    if not isfile(filePath) then
+        writefile(filePath, "") -- create an empty file
+        XENO:Notify("Config System", "Created file: " .. fileName, 5)
+    else
+        XENO:Notify("Config System", "File already exists: " .. fileName, 5)
+    end
+end
+
+-- Add data to an existing file
+function XENO:AddToFile(fileName, data)
+    ensureFolder()
+    local filePath = ConfigFolder .. "/" .. fileName .. ".txt"
+    if isfile(filePath) then
+        local currentData = readfile(filePath)
+        writefile(filePath, currentData .. tostring(data) .. "\n")
+        XENO:Notify("Config System", "Added to file: " .. fileName, 5)
+    else
+        XENO:Notify("Config System", "File does not exist: " .. fileName, 5)
+    end
+end
+
 
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 650, 0, 650) end end
