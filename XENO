@@ -742,6 +742,54 @@ task.delay(1, function()
     end
 end)
 
+-- Config File System
+local ConfigFolder = "XENOConfig"
+local ConfigFile = ConfigFolder .. "/HYD394"
+
+-- Ensure folder exists
+if not isfolder(ConfigFolder) then
+    makefolder(ConfigFolder)
+end
+
+-- Default theme if nothing saved
+local theme = "Purple"  
+
+-- Load saved theme
+if isfile(ConfigFile) then
+    local savedTheme = readfile(ConfigFile)
+    if savedTheme ~= "" and Themes[savedTheme] then
+        theme = savedTheme
+    end
+else
+    -- Save default theme if no file exists
+    writefile(ConfigFile, theme)
+end
+
+-- Apply theme to CurrentTheme
+local function ApplySavedTheme()
+    local Data = Themes[theme]
+    if not Data then return end
+    CurrentTheme.Header = Data.Header
+    CurrentTheme.Accent1 = Data.Accent1
+    CurrentTheme.Accent2 = Data.Accent2
+    CurrentTheme.SwitchOn = Data.SwitchOn
+    CurrentTheme.Text = Data.Text
+    UpdateThemeVisuals()
+end
+
+ApplySavedTheme()
+
+-- Function to change theme and save it
+local function SetAndSaveTheme(newTheme)
+    if Themes[newTheme] then
+        theme = newTheme
+        writefile(ConfigFile, theme)
+        ApplySavedTheme()
+        XENO:Notify("THEME UPDATED", "Active: " .. theme, 2)
+    end
+end
+
+
 --- Start Sequence ---
 task.spawn(function()
     local IntroFrame = Create("Frame", {Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 2000, Parent = ScreenGui})
