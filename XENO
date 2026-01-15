@@ -39,6 +39,9 @@ local Themes = {
     Red = {Header = Color3.fromRGB(30, 20, 20), Accent1 = Color3.fromRGB(255, 40, 60), Accent2 = Color3.fromRGB(255, 100, 120), SwitchOn = Color3.fromRGB(220, 0, 60), Text = Color3.fromRGB(255, 255, 255)}
 }
 
+local themeName = _G.theme or "Purple"  -- fallback to Purple if _G.theme not set
+local SelectedTheme = Themes[themeName
+
 local CurrentTheme = {
     Background = Color3.fromRGB(12, 12, 18),
     Header = Themes.Purple.Header,
