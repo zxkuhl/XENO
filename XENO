@@ -40,7 +40,7 @@ local Themes = {
 }
 
 local themeName = _G.theme or "Purple"  -- fallback to Purple if _G.theme not set
-local SelectedTheme = Themes[themeName
+local SelectedTheme = Themes[themeName]
 
 local CurrentTheme = {
     Background = Color3.fromRGB(12, 12, 18),
