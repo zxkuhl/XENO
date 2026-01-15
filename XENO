@@ -730,6 +730,22 @@ function XENO:AddToFile(fileName, data)
     end
 end
 
+function XENO:GetFile(fileName)
+    local ConfigFolder = "XENOConfigs"  -- ensure it uses the correct folder
+    if not isfolder(ConfigFolder) then
+        makefolder(ConfigFolder)
+    end
+
+    local filePath = ConfigFolder .. "/" .. fileName .. ".txt"
+
+    if not isfile(filePath) then
+        XENO:Notify("Config System", "File does not exist: " .. fileName, 5)
+        return nil
+    end
+
+    local data = readfile(filePath)
+    return data  -- Returns raw text
+end
 
 --- Squircle Toggle ---
 local function GetWindowSize() if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then return UDim2.new(0.65, 0, 0.75, 0) else return UDim2.new(0, 650, 0, 650) end end
