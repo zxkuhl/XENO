@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 return {
     LocalPlayer = Players.LocalPlayer,
     Blacklist = {
-        ["4392523377"] = true
+        ["4392523377"] = true,
+        ["AvaAllacat_friend1"] = true
     }
 }
