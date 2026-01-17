@@ -4,6 +4,6 @@ return {
     LocalPlayer = Players.LocalPlayer,
     Blacklist = {
         ["4392523377"] = true,
-        ["AvaAllacat_friend1"] = true
+        ["AvaAllacat_Friend1"] = true
     }
 }
