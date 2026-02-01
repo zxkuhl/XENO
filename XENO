@@ -6,7 +6,7 @@
 ]] 
 
 --- Configuration ---
-local DiscordInvite = _G.XENO_DISCORD_INVITE or "https://discord.gg/KPUPp4m9pJ"
+local DiscordInvite = _G.XENO_DISCORD_INVITE or "https://discord.gg/TdaWNwNAMa"
 
 --- Services ---
 local Players = game:GetService("Players")
@@ -774,7 +774,7 @@ task.delay(300, function()
 	if XENO and XENO.Notify then
 		XENO:Notify(
 			"XENO LIBRARY",
-			"Enjoying this Script library?\nMake your own at https://discord.gg/KPUPp4m9pJ",
+			"Enjoying this Script library?\nMake your own at https://discord.gg/TdaWNwNAMa",
 			6
 		)
 	end
