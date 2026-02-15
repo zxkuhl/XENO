@@ -6,5 +6,5 @@ return {
     {title = "VALINTINES", message = "no update yet but happy valintines day!"},
     {title = "UP & COMING", message = "FORSAKEN SCRIPT! // COMING SOON"},
     {title = "NEW RELEASE", message = "ABYSS SCRIPT! // NEW, TRY IT OUT!"},
-    {title = "SCRIPT UPDATE", message = "ABYSS SCRIPT UPDATE /// added flight thingy and tried to fix auto farm"},
+    {title = "SCRIPT UPDATE", message = "ABYSS SCRIPT UPDATE /// Maybe final update. improved features tho!"},
 }
