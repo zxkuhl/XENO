@@ -6,4 +6,5 @@ return {
     {title = "UP & COMING", message = "FORSAKEN SCRIPT! // COMING SOON"},
     {title = "NEW RELEASE", message = "GARDEN HORIZONS SCRIPT 🌱! // NEW, TRY IT OUT!"},
     {title = "SCRIPT UPDATE", message = "ABYSS SCRIPT UPDATE /// Maybe final update. improved features tho!"},
+    {title = "ZYNX", message = "ZYNX AI Made by zxkuhl is our help ai built to assist and guide you with your exploiting!"},
 }
